@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Editor</title>
+    <style>
+        #canvasContainer {
+            position: relative;
+        }
+        #imageCanvas {
+            border: 1px solid #000;
+        }
+        #textInput {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <h1>Photo Editor</h1>
+    <input type="file" id="fileInput" accept="image/*"><br><br>
+    <textarea id="textInput" rows="2" cols="30" placeholder="Type text here..."></textarea><br><br>
+    <button onclick="addTextToImage()">Add Text to Photo</button>
+    <button onclick="downloadImage()">Download Result</button><br><br>
+    <div id="canvasContainer">
+        <canvas id="imageCanvas"></canvas>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const imageCanvas = document.getElementById('imageCanvas');
+        const textInput = document.getElementById('textInput');
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        imageCanvas.width = img.width;
+                        imageCanvas.height = img.height;
+                        const ctx = imageCanvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function addTextToImage() {
+            const text = textInput.value;
+            const ctx = imageCanvas.getContext('2d');
+            ctx.font = '30px Arial';
+            ctx.fillStyle = '#FFFFFF'; // Text color
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(text, 10, 10); // Adjust position as needed
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'edited_image.png';
+            link.href = imageCanvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
